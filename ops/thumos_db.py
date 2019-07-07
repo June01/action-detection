@@ -136,29 +136,37 @@ class THUMOSDB(object):
     def prepare_data(self, db_folder):
 
         def load_subset_info(subset):
-            duration_file = '{}_durations.txt'.format(subset)
+            # duration_file = '{}_durations.txt'.format(subset)
+            duration_file = 'thumos14_video_length_{}.txt'.format(subset)
             annotation_folder = 'temporal_annotations_{}'.format(subset)
             annotation_files = glob.glob(os.path.join(db_folder, annotation_folder, '*'))
             avoid_file = '{}_avoid_videos.txt'.format(subset)
 
             durations_lines = [x.strip() for x in open(os.path.join(db_folder, duration_file))]
             annotaion_list = [(os.path.basename(f).split('_')[0], list(open(f))) for f in annotation_files]
+            # print(annotaion_list[0])
             avoid_list = [x.strip().split() for x in open(os.path.join(db_folder, avoid_file))]
 
             avoid_set = set(['-'.join(x) for x in avoid_list])
-            print("Loading avoid set:")
-            print(avoid_set)
+            # print("Loading avoid set:")
+            # print(avoid_set)
 
             #process video info
-            video_names = [durations_lines[i].split('.')[0] for i in range(0, len(durations_lines), 2)]
-            video_durations = [durations_lines[i] for i in range(1, len(durations_lines), 2)]
+            video_names = [durations_lines[i].split()[0] for i in range(len(durations_lines))]
+            # print(len(video_names))
+            video_durations = [durations_lines[i].split()[1] for i in range(len(durations_lines))]
+            # print(video_durations[0])
             video_info = list(zip(video_names, video_durations))
 
             duration_dict = dict(video_info)
 
             # reorganize annotation to attach them to videos
             video_table = {v: list() for v in video_names}
+            # print(len(duration_dict.keys()))
+            # print(duration_dict.keys())
             for cls_name, annotations in annotaion_list:
+                # print(len(annotations))
+                # print(annotations[0])
                 for a in annotations:
                     items = a.strip().split()
                     vid = items[0]
